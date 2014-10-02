@@ -12,8 +12,11 @@ from sources import youtube
 from jobqueue import JobQueue
 from time import sleep
 
+# Instantiate our job queue for downloads
 jobq = JobQueue()
 
+# Set the consumer function for the job queue.  Now anything put in the job
+# queue will be processed by this function
 @jobq.consumer()
 def download_source( source ):
     metadata = source.download( MUSIC_DIR )
@@ -32,6 +35,9 @@ def download_source( source ):
                     break
 
 def create_error( message, status_code ):
+    """
+    Short-hand method for returning an API error
+    """
     response = jsonify( {'message': message} )
     response.status_code = status_code
     return response
