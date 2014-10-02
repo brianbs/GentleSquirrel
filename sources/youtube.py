@@ -4,7 +4,6 @@ downloading music
 """
 from gdata.youtube.service import YouTubeService, YouTubeVideoQuery
 from source import SourceBase
-from settings import MUSIC_DIR
 from subprocess import Popen, PIPE
 
 class YTInterface( SourceBase ):
@@ -16,7 +15,8 @@ class YTInterface( SourceBase ):
         """
         self.search = search
         self.vid_details = self._get_youtube_details()
-        # This output format is 
+        # This output format is determined by the -o argument in youtube-dl.
+        # So if that changes, this has to change
         self.filename = self.vid_details['title'] + "-" + self.vid_details['id'] + ".aac"
         # This replace is neccessary because youtube dl replaces double quotes with single quotes
         self.filename = self.filename.replace( '"', "'" )
@@ -31,9 +31,9 @@ class YTInterface( SourceBase ):
     def download( self, out_dir ):
         """
         """
+        if not self.is_valid():
+            raise Exception( "download method called on invalid source" )
         vid_details = self.vid_details
-        if vid_details is None:
-            return False
         p = Popen( ["youtube-dl", "-x", "--audio-format", "aac", "-o",
             out_dir + "/%(title)s-%(id)s.%(ext)s", vid_details['url']],
             stdout = PIPE )
@@ -43,9 +43,9 @@ class YTInterface( SourceBase ):
         vid_output = ""
         for line in stdout.split("\n"):
             if "Destination" in line and ".aac" in line:
-                vid_output = line.split( "Destination:" )[1].strip().\
-                        split(MUSIC_DIR)[-1][1:]
-        return None if vid_output == "" else vid_output
+                vid_output = line.split( "Destination:" )[1].strip()
+        metadata = { 'filepath': vid_output }
+        return metadata
 
     def _get_youtube_details( self ):
         """

@@ -9,10 +9,27 @@ from mpdinterface import MPDInterface
 from settings import MPD_HOST, MPD_PORT, MUSIC_DIR
 from flask import jsonify, request
 from sources import youtube
-from dlqueue import DLQueue
+from jobqueue import JobQueue
+from time import sleep
 
-# Dont like this being global
-dlq = DLQueue()
+jobq = JobQueue()
+
+@jobq.consumer()
+def download_source( source ):
+    metadata = source.download( MUSIC_DIR )
+    if 'filepath' in metadata:
+        # Add a trailing slash to the music dir if there isn't one already
+        music_dir = MUSIC_DIR + "/" if MUSIC_DIR[-1] != "/" else MUSIC_DIR
+        filename = metadata['filepath'].split( music_dir )[-1]
+        with MPDInterface( MPD_HOST, MPD_PORT ) as mpd:
+            mpd.update()
+            for i in range(10):
+                try:
+                    mpd.add( filename )
+                except:
+                    sleep(3)
+                else:
+                    break
 
 def create_error( message, status_code ):
     response = jsonify( {'message': message} )
@@ -74,13 +91,35 @@ class QueueAPI( Resource ):
                         '%s retrieved from cache and added to queue.' %\
                                 yt.vid_details['title']} )
                 except:
-                    dlq.put( yt )
+                    jobq.add( yt )
             else:
                 return create_error( "Could not find the requested song.", 404 )
             return jsonify( {'message': '"%s" [%ss] added to download queue.' %\
                     (yt.vid_details['title'], yt.vid_details['length'])} )
         else:
             return create_error( "Unknown source-type!  Could not queue.", 400 )
+
+class CurrentSongAPI( Resource ):
+    def __init__( self ):
+        self.postreqparse = reqparse.RequestParser()
+        self.postreqparse.add_argument( "operation", required = True,
+                help = "No currentsong operation specified", location = "json" )
+        super( CurrentSongAPI, self ).__init__()
+    
+    def get( self ):
+        with MPDInterface( MPD_HOST, MPD_PORT ) as mpd:
+            curr = mpd.currentsong()
+        return jsonify( curr )
+
+    def post( self ):
+        args = self.postreqparse.parse_args()
+        if args['operation'] == "next":
+            with MPDInterface( MPD_HOST, MPD_PORT ) as mpd:
+                mpd.next()
+                current_song = mpd.currentsong()
+        else:
+            return create_error( "Invalid operation specified", 400 )
+        return jsonify( current_song )
 
 class PlaybackAPI( Resource ):
     """
