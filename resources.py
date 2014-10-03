@@ -26,14 +26,9 @@ def download_source( source ):
         filename = metadata.filepath.split( music_dir )[-1]
         # Try for 30 seconds to add the song to the current playlist
         with MPDInterface( MPD_HOST, MPD_PORT ) as mpd:
-            mpd.update()
-            for i in range(10):
-                try:
-                    mpd.add( filename )
-                except:
-                    sleep(3)
-                else:
-                    break
+            mpd.add( filename, new_file = True )
+    else:
+        raise Exception( "Download method returned no metadata" )
 
 def create_error( message, status_code ):
     """
