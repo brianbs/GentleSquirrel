@@ -46,12 +46,10 @@ class JobQueue():
         """
         self._default_consumer = consumer
 
-    def consumer( self ):
+    def consumer( self, func ):
         """
         Does the same thing as register_consumer, but can be used as a decorator
         to specify the consumer function
         """
-        def decorator( f ):
-            self._default_consumer = f
-            return f
-        return decorator
+        self._default_consumer = func
+        return func

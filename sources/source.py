@@ -1,4 +1,9 @@
 from abc import ABCMeta, abstractmethod
+from collections import namedtuple
+
+# Metadata object.  This is how the calling thread will know where the
+# downloaded file ended up
+Metadata = namedtuple( 'Metadata', ['filename', 'filepath', 'title', 'len'] )
 
 class SourceBase( object ):
     """
@@ -11,8 +16,8 @@ class SourceBase( object ):
     def download( self, out_dir ):
         """
         Subclasses should implement this as a method that downloads an audio
-        file to the specified output directory, and should return the location 
-        of the downloaded file if successful, or none if unsuccessful
+        file to the specified output directory, and should return a metadata
+        tuple if successful, or None if unsuccessful
         """
         return
 

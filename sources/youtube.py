@@ -3,7 +3,7 @@ This file contains all of the logic for interfacing with the youtube API and
 downloading music
 """
 from gdata.youtube.service import YouTubeService, YouTubeVideoQuery
-from source import SourceBase
+from source import SourceBase, Metadata
 from subprocess import Popen, PIPE
 
 class YTInterface( SourceBase ):
@@ -39,12 +39,15 @@ class YTInterface( SourceBase ):
             stdout = PIPE )
         stdout = p.communicate()[0]
         if p.returncode != 0:
-            return None
+            raise Exception( "download failed for youtube source" )
         vid_output = ""
         for line in stdout.split("\n"):
             if "Destination" in line and ".aac" in line:
                 vid_output = line.split( "Destination:" )[1].strip()
-        metadata = { 'filepath': vid_output }
+        if vid_output == "":
+            raise Exception( "download failed for Youtube source" )
+        metadata = Metadata( self.filename, vid_output,
+                self.vid_details['title'], self.vid_details['length'] )
         return metadata
 
     def _get_youtube_details( self ):
