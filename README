@@ -1,4 +1,6 @@
-So this project was inspired by a chat-bot that's in use at the place I work.
+GentleSquid is a restful internet jukebox.  Requires an MPD server set up on the
+back-end.  API calls can be used to download songs from youtube and add them to
+the playlist.  API details below
 
 Make sure you edit settings.py to point to your MPD server and music directory
 
