@@ -1,0 +1,55 @@
+So this project was inspired by a chat-bot that's in use at the place I work.
+
+Make sure you edit settings.py to point to your MPD server and music directory
+
+The API
+---------------------------------------------------
+Queue API:
+    Endpoint: /gsplus/api/v0.1/queue
+    Methods: GET, PUT, POST
+        GET: Returns a representation of the current playlist
+            JSON ARGUMENTS:
+                NONE
+        PUT: Given a playlist representation, overwrites the current playlist
+            JSON ARGUMENTS: 
+                'playlist' - A list of JSON dicts, each with a
+                'file' key that specifies the name of the file
+        POST: Where the magic happens.  Downloads songs from a source and
+        puts them in the current playlist
+            JSON ARGUMENTS:
+                'source-type' - What type of source are you pulling from?
+                    (optional, "youtube" by default, only one implemented so far)
+                'source' - Depends on the source type, but usually a query of
+                    some sort (With the youtube source-type, this can even be a
+                    youtube video id)
+
+CurrentSongAPI:
+    Endpoint: /gsplus/api/v0.1/queue/currentsong
+    Methods: GET, POST
+        GET: Returns the currently playing song
+            JSON ARGUMENTS:
+                NONE
+        POST: Perform a currentsong operation
+            JSON ARGUMENTS:
+                'operation' - the operation to perform (currently only 'next'
+                is supported'
+
+PlaybackAPI:
+    Endpoint: /gsplus/api/v0.1/state/playback
+    Methods: GET, PUT
+        GET: Returns the current playback state ('play, pause, stop')
+            JSON ARGUMENTS:
+                NONE
+        PUT: Change the current playback state
+            JSON ARGUMENTS:
+                'playback' - "play", "pause", or "stop"
+
+VolumeAPI:
+    Endpoint: /gsplus/api/v0.1/state/volume
+    Methods: GET, PUT
+        GET: Returns the current volume
+            JSON ARGUMENTS:
+                NONE
+        PUT: Set the current volume
+            JSON ARGUMENTS:
+                'volume' - an integer 1-100
