@@ -21,10 +21,8 @@ jobq = JobQueue()
 def download_source( source ):
     metadata = source.download( MUSIC_DIR )
     if metadata is not None:
-        # Add a trailing slash to the music dir if there isn't one already
         music_dir = MUSIC_DIR + "/" if MUSIC_DIR[-1] != "/" else MUSIC_DIR
         filename = metadata.filepath.split( music_dir )[-1]
-        # Try for 30 seconds to add the song to the current playlist
         with MPDInterface( MPD_HOST, MPD_PORT ) as mpd:
             mpd.add( filename, new_file = True )
     else:
@@ -64,7 +62,6 @@ class QueueAPI( Resource ):
         Put a representation of a playlist to replace the current playlist
         """
         args = request.get_json()
-        print args['playlist']
         with MPDInterface( MPD_HOST, MPD_PORT ) as mpd:
             mpd.clear()
             for f in args['playlist']:
@@ -80,6 +77,7 @@ class QueueAPI( Resource ):
         """
         This is the method used to add music to the current playlist
         """
+        print request.get_json()
         args = self.postreqparse.parse_args()
         if args[ 'source-type' ] == "youtube":
             yt = youtube.YTInterface( args[ 'source' ] )

@@ -1,0 +1,15 @@
+Flask==0.10.1
+Flask-RESTful==0.2.12
+Jinja2==2.7.3
+MarkupSafe==0.23
+Werkzeug==0.9.6
+aniso8601==0.83
+argparse==1.2.1
+distribute==0.6.24
+gdata==2.0.18
+itsdangerous==0.24
+python-mpd2==0.5.3
+pytz==2014.7
+six==1.7.3
+wsgiref==0.1.2
+youtube-dl==2014.09.04.3

@@ -60,6 +60,7 @@ class YTInterface( SourceBase ):
         query.racy = 'include'
         query.orderby = 'relevance'
         feed = yt_service.YouTubeQuery( query )
+        print feed.entry[0]
         if len( feed.entry ) > 0:
             return { 'id': feed.entry[0].id.text.split('/')[-1],
                     'url': feed.entry[0].GetSwfUrl(),

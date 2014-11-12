@@ -1,7 +1,7 @@
 """
 The MPD Interface
 """
-from mpd import MPDClient
+from mpd import MPDClient, CommandError
 from time import sleep
 
 class MPDInterface( MPDClient ):
@@ -16,8 +16,6 @@ class MPDInterface( MPDClient ):
 
 
     def add( self, filename, new_file = False ):
-        """
-        """
         if new_file:
             self.update()
         new_file_added = False
@@ -37,8 +35,8 @@ class MPDInterface( MPDClient ):
             else:
                 break
         if new_file and not new_file_added:
-            raise Exception( "New audo file could not be added" )
-        if self.status()['state'] == "stop":
+            raise CommandError( "New audio file could not be added" )
+        if self.status()['state'] != "play":
             self.play()
 
     def __enter__( self ):

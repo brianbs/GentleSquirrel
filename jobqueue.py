@@ -2,9 +2,6 @@ from threading import Thread
 from Queue import Queue
 
 class JobQueue():
-    """
-    An extremely minimal job queue / threadpool
-    """
     def __init__( self, num_processes = 10, default_consumer = None ):
         """
         Creates a queue to hold the jobs, launches the worker threads, and,
@@ -16,8 +13,8 @@ class JobQueue():
         for i in range( num_processes ):
             t = Thread( target = JobQueue.__work_func, args = (self._q, ) )
             t.daemon = True
-            t.start()
             self._worker_threads.append( t )
+            t.start()
 
     def add( self, job_description, worker = None ):
         """
@@ -34,9 +31,9 @@ class JobQueue():
         In this function, each thread pops a job off the queue and performs it
         """
         while True:
-            job_description, callback = queue.get()
+            job_description, consumer = queue.get()
             try:
-                callback( job_description )
+                consumer( job_description )
             except:
                 continue
 
