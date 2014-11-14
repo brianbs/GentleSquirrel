@@ -1,4 +1,4 @@
-GentleSquid is a restful internet jukebox.  Requires an MPD server set up on the
+GentleSquirrel is a restful internet jukebox.  Requires an MPD server set up on the
 back-end.  API calls can be used to download songs from youtube and add them to
 the playlist.  API details below
 
